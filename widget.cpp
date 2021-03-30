@@ -7,6 +7,7 @@
 
 int g_nActScreenX;
 int g_nActScreenY;
+QPoint lastPos;
 
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
@@ -71,7 +72,7 @@ Widget::Widget(QWidget *parent) :
 
     this->showFullScreen();
 
-    qDebug() << g_nActScreenX << g_nActScreenY;
+//    qDebug() << g_nActScreenX << g_nActScreenY;
 }
 
 Widget::~Widget()
@@ -125,6 +126,14 @@ void Widget::paintEvent(QPaintEvent *)
     painter1.drawLine(line50);
     QLineF line51(g_nActScreenX/2, g_nActScreenY/2 - 30, g_nActScreenX/2, g_nActScreenY/2 + 30);
     painter1.drawLine(line51);
+
+    QPainter painterJ(this);
+    QPen pen;
+    pen.setColor(Qt::blue);
+    pen.setWidth(1);
+    painterJ.setPen(pen);
+    painterJ.drawLine(0, lastPos.y(), g_nActScreenX, lastPos.y());
+    painterJ.drawLine(lastPos.x(), 0, lastPos.x(), g_nActScreenY);
 }
 
 void Widget::keyPressEvent(QKeyEvent *event)
@@ -138,10 +147,12 @@ void Widget::keyPressEvent(QKeyEvent *event)
     }
 }
 
+//鼠标滑动事件
 void Widget::mouseMoveEvent(QMouseEvent *e)
 {
+    lastPos = e->globalPos();
+    update();
     QPoint p_ab = e->globalPos();//整个桌面位置
-//    QPoint p_re = e->pos();//窗口内位置
 
     QString str;
     str = QString("%1 , %2").arg(p_ab.x()).arg(p_ab.y());
@@ -163,8 +174,11 @@ void Widget::mouseMoveEvent(QMouseEvent *e)
     Label51->setText(str);
 }
 
+//鼠标点击事件
 void Widget::mousePressEvent(QMouseEvent *e)
 {
+    lastPos = e->globalPos();
+    update();
     Label->setText(QString("%1 , %2").arg(e->globalX()).arg(e->globalY()));
     Label11->setText(QString("%1 , %2").arg(130 - e->globalX()).arg(130 - e->globalY()));
     Label21->setText(QString("%1 , %2").arg(g_nActScreenX - 130 - e->globalX()).arg(130 - e->globalY()));
